@@ -1,1 +1,846 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>İlişkimde Kendi Tavırlarım – Dürüstlük Testi</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #fdf6ee;
+    --surface: #fff9f3;
+    --gold: #c9a96e;
+    --gold-light: #e8d5b0;
+    --gold-dark: #8a6d3b;
+    --rose: #c97b7b;
+    --rose-light: #f5e0e0;
+    --text: #2c1f14;
+    --text-muted: #7a6555;
+    --border: #e8d5b0;
+    --selected: #c9a96e;
+    --selected-bg: #fdf1e0;
+    --radius: 14px;
+    --shadow: 0 4px 30px rgba(180,130,60,0.10);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Decorative background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(201,169,110,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(201,123,123,0.08) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    text-align: center;
+    padding: 48px 0 32px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header-icon {
+    font-size: 2.4rem;
+    margin-bottom: 16px;
+    display: block;
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+
+  .header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.6rem, 5vw, 2.2rem);
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.25;
+    margin-bottom: 8px;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--gold-dark);
+  }
+
+  .header p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 12px auto 0;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 20px auto;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .progress-bar {
+    height: 5px;
+    background: var(--gold-light);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), var(--rose));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+
+  .q-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1rem, 3.5vw, 1.18rem);
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  /* ── OPTIONS ── */
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: var(--text);
+    transition: all 0.22s ease;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--selected-bg);
+    opacity: 0;
+    transition: opacity 0.22s ease;
+  }
+
+  .option-btn:hover {
+    border-color: var(--gold);
+    transform: translateX(3px);
+  }
+
+  .option-btn:hover::before { opacity: 1; }
+
+  .option-btn.selected {
+    border-color: var(--gold);
+    background: var(--selected-bg);
+    transform: translateX(3px);
+  }
+
+  .option-btn.selected .opt-letter {
+    background: var(--gold);
+    color: #fff;
+    border-color: var(--gold);
+  }
+
+  .opt-letter {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.22s ease;
+    position: relative;
+    z-index: 1;
+    margin-top: 1px;
+  }
+
+  .opt-text {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── NAV BUTTONS ── */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .btn {
+    padding: 12px 28px;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.22s ease;
+  }
+
+  .btn-back {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .btn-back:hover {
+    border-color: var(--gold);
+    color: var(--gold-dark);
+  }
+
+  .btn-next {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(201,169,110,0.35);
+  }
+
+  .btn-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(201,169,110,0.45);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-result {
+    background: linear-gradient(135deg, var(--rose), #a05555);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(201,123,123,0.35);
+  }
+
+  .btn-result:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(201,123,123,0.45);
+  }
+
+  .btn-result:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ── RESULT SCREEN ── */
+  .result-screen {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .result-header {
+    text-align: center;
+    padding: 32px 0 24px;
+  }
+
+  .result-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .result-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  /* ── SCORE CARD ── */
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .score-title {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .score-bars { display: flex; flex-direction: column; gap: 10px; }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .score-label {
+    width: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .score-track {
+    flex: 1;
+    height: 8px;
+    background: var(--gold-light);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .score-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .fill-a { background: #6db57a; }
+  .fill-b { background: var(--gold); }
+  .fill-c { background: #e0a060; }
+  .fill-d { background: var(--rose); }
+
+  .score-count {
+    width: 28px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ── RESULT MESSAGE ── */
+  .result-message {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .badge-green { background: #e8f5eb; color: #3a7d4a; }
+  .badge-gold { background: #fdf1e0; color: #8a6d3b; }
+  .badge-orange { background: #fdf0e0; color: #9a5a1a; }
+  .badge-red { background: #fde8e8; color: #8a3030; }
+
+  .result-message h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .result-message p {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  /* ── DETAIL TABLE ── */
+  .detail-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .detail-section h4 {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.83rem;
+  }
+
+  .detail-row:last-child { border-bottom: none; }
+
+  .detail-q {
+    color: var(--text-muted);
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .detail-a {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  .da-a { background: #e8f5eb; color: #3a7d4a; }
+  .da-b { background: #fdf1e0; color: #8a6d3b; }
+  .da-c { background: #fdf0e0; color: #9a5a1a; }
+  .da-d { background: #fde8e8; color: #8a3030; }
+
+  /* ── RESTART ── */
+  .btn-restart {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    border-radius: 99px;
+    text-align: center;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.22s ease;
+    margin-top: 8px;
+  }
+
+  .btn-restart:hover {
+    border-color: var(--gold);
+    color: var(--gold-dark);
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 400px) {
+    .question-card { padding: 20px 16px; }
+    .btn { padding: 11px 20px; font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── SURVEY SCREEN ── -->
+  <div id="surveyScreen">
+    <div class="header">
+      <span class="header-icon">💍</span>
+      <h1>Eşimle İlişkimde<br><em>Kendi Tavırlarım</em></h1>
+      <div class="divider"></div>
+      <p>Her soruyu okurken <strong>son birkaç ayı</strong> düşün ve sana en yakın gelen şıkkı seç. Dürüst cevaplar gerçek farkındalık yaratır.</p>
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="progressText">Soru 1 / 12</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div id="questionArea"></div>
+
+    <div class="nav">
+      <button class="btn btn-back" id="btnBack" onclick="navigate(-1)">← Geri</button>
+      <button class="btn btn-next" id="btnNext" onclick="navigate(1)" disabled>İleri →</button>
+    </div>
+  </div>
+
+  <!-- ── RESULT SCREEN ── -->
+  <div id="resultScreen" class="result-screen hidden"></div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    text: "Eşimle günlük konuşmalarımda veya ona bir şeyi hatırlatırken genellikle hangi üslubu kullanıyorum?",
+    label: "Ses Tonum ve Yaklaşım Biçimim",
+    options: [
+      "Her zaman yumuşak, nazik ve sevgi dolu.",
+      "Genelde iyi niyetli ama bazen yorgunluktan dolayı mesafeli.",
+      "Sıklıkla düzeltici, hafif eleştirel veya öğretici.",
+      "Genelde sert, yargılayıcı veya emir verir gibi."
+    ]
+  },
+  {
+    text: "Eşim eve geldiği o ilk anlarda ona nasıl bir enerji veriyorum?",
+    label: "Kapıdaki Karşılama",
+    options: [
+      "Güler yüzle, sıcak bir ilgiyle ve \"hoş geldin\" diyerek.",
+      "Sakin ve sıradan; her zamanki ev haliyle.",
+      "Biraz soğuk veya ilgisiz; o anki meşguliyetimi bozmadan.",
+      "Hemen günün sorunlarını veya eksiklerini dile getirerek."
+    ]
+  },
+  {
+    text: "Eşimin yaptıklarıyla ilgili ona geri bildirim verme biçimim nasıldır?",
+    label: "Eleştiri – Takdir Dengesi",
+    options: [
+      "Onu sık sık takdir ederim ve güzel yanlarını yüksek sesle söylerim.",
+      "Takdir ederim ama bazen eleştirilerim daha çok akılda kalıyor olabilir.",
+      "Genelde sadece yanlış veya eksik yaptığı şeyleri dile getiririm.",
+      "Neredeyse hiç takdir etmem; çünkü her şey zaten onun göreviymiş gibi hissederim."
+    ]
+  },
+  {
+    text: "Eşim bana bir zayıflığını veya hatasını anlattığında bu bilgiyi nasıl saklıyorum?",
+    label: "Güven ve Kırılganlık",
+    options: [
+      "Emanet gibi korurum; asla ona karşı bir silah olarak kullanmam.",
+      "Genelde korurum ama çok sinirlendiğimde ima yoluyla hatırlatabilirim.",
+      "Tartışma anlarında haklı çıkmak için bazen bu bilgileri yüzüne vururum.",
+      "Her fırsatta bu zayıflığını ona karşı bir ders veya eleştiri olarak kullanırım."
+    ]
+  },
+  {
+    text: "Eşim benim dışımdaki bir şeyden (hobileri, arkadaşları vb.) keyif aldığında tavrım ne oluyor?",
+    label: "Onun Bireysel Mutluluğuna Bakışım",
+    options: [
+      "Mutluluğuyla gurur duyarım ve enerjisini desteklerim.",
+      "Kendi halindedir, pek karışmam ama çok da ortak olmam.",
+      "Biraz bozulurum; o vakti bize ayırması gerektiğini düşünürüm.",
+      "Bu mutluluğunu gölgelerim veya bir şekilde suçlu hissetmesine sebep olurum."
+    ]
+  },
+  {
+    text: "Bir konuda kırıldığımda veya bir sorun olduğunda bunu nasıl paylaşıyorum?",
+    label: "Sorunları Dile Getirme Biçimim",
+    options: [
+      "Sakince, suçlamadan ve çözüm bulmak amacıyla.",
+      "Bir süre sessiz kalarak veya imalarla anlatmaya çalışarak.",
+      "Sesimi yükselterek ve geçmiş hataları da işin içine katarak.",
+      "Günlerce küs kalarak veya ağır eleştirilerle tepki göstererek."
+    ]
+  },
+  {
+    text: "Eşime, onu hâlâ bir \"erkek\" olarak beğendiğimi ve seçtiğimi hissettiriyor muyum?",
+    label: "Onu \"Seçilmiş\" Hissettirme",
+    options: [
+      "Evet; küçük jestlerle, bakışımla veya sözlerimle bunu sık sık hissettiririm.",
+      "Bazen; ama hayatın koşturmacasında genelde unutuyorum.",
+      "Nadiren; genelde sadece özel günlerde veya o çok çabalarsa.",
+      "Hayır; sadece aynı evin sorumluluklarını paylaşan birer ebeveyn gibiyiz."
+    ]
+  },
+  {
+    text: "Eşim bana bir şey anlatırken ona ne kadar \"orada\" olduğumu hissettiriyorum?",
+    label: "Dinleme ve Anlama Kalitesi",
+    options: [
+      "Gözlerinin içine bakarak ve onu gerçekten hissetmeye çalışarak.",
+      "Dinliyorum ama bir yandan kafamda kendi işlerimi planlıyorum.",
+      "Yüzeysel dinliyorum; genelde telefonla veya televizyonla ilgileniyorum.",
+      "Sözünü kesip hemen kendi fikrimi söylüyorum veya onu susturuyorum."
+    ]
+  },
+  {
+    text: "Kendi tavırlarımı dürüstçe düşündüğümde; eşimin içine kapanmasına ben mi sebep oluyorum?",
+    label: "Sessiz Çekilme Döngüsü",
+    options: [
+      "Hayır; her zaman konuşabileceği huzurlu ve yumuşak bir ortam yaratırım.",
+      "Belki çok dırdır ettiğim anlarda onu yoruyor olabilirim.",
+      "Muhtemelen; çünkü genelde ona hatalarını söylediğim için susmayı seçiyor.",
+      "Evet; ona karşı o kadar eleştirelim ki kaçmak için telefonunda/işinde kayboluyor."
+    ]
+  },
+  {
+    text: "Eşimle olan iletişimimde \"yumuşak ve birleştirici\" bir enerji sergilemek için ne kadar çabalıyorum?",
+    label: "Kadınsı Yumuşaklık ve Esneklik",
+    options: [
+      "Yorulsam bile gardımı indirip onun yanında yumuşak kalmaya özen gösteririm.",
+      "Sadece işler yolunda gidiyorsa yumuşak olurum.",
+      "Genelde savunmacı ve sertim; yumuşak olmanın bir \"zayıflık\" olduğunu düşünürüm.",
+      "Sürekli bir savaş içindeyim; haklı çıkmak yumuşak olmaktan daha önemli."
+    ]
+  },
+  {
+    text: "Eşim bir hata yaptığında ve özür dilediğinde o yarayı ne kadar sürede kapatıyorum?",
+    label: "Affetme ve İyileşme",
+    options: [
+      "Hemen iyileştiririm ve konuyu bir daha açmamak üzere kapatırım.",
+      "Affederim ama tamamen unutmam biraz zaman alır.",
+      "Affetmiş gibi görünürüm ama ilk tartışmada o hatayı hatırlatırım.",
+      "Asla tam anlamıyla affetmem; o hatayı bir ceza gibi sürekli üzerinde tutarım."
+    ]
+  },
+  {
+    text: "Eşimden sevgi ve ilgi beklerken, ben ona ne kadar karşılıksız \"sıcaklık\" veriyorum?",
+    label: "Takdir Beklentisi vs. Takdir Verme",
+    options: [
+      "Karşılık beklemeden sevgimi ve nezaketimi cömertçe gösteririm.",
+      "Genelde o bir adım atarsa ben de karşılığını veririm.",
+      "Önce onun beni mutlu etmesi gerektiğini düşünürüm, sonra ben veririm.",
+      "Sıcaklık göstermeyi bir pazarlık aracı olarak kullanırım."
+    ]
+  }
+];
+
+const letters = ['A', 'B', 'C', 'D'];
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function renderQuestion() {
+  const q = questions[current];
+  const saved = answers[current];
+  const isLast = current === questions.length - 1;
+
+  const area = document.getElementById('questionArea');
+  area.innerHTML = `
+    <div class="question-card">
+      <div class="q-number">${q.label}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="options" id="opts">
+        ${q.options.map((o, i) => `
+          <button class="option-btn ${saved === i ? 'selected' : ''}" onclick="select(${i})">
+            <span class="opt-letter">${letters[i]}</span>
+            <span class="opt-text">${o}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // progress
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Soru ${current + 1} / ${questions.length}`;
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  // buttons
+  document.getElementById('btnBack').style.visibility = current === 0 ? 'hidden' : 'visible';
+  const btnNext = document.getElementById('btnNext');
+  btnNext.textContent = isLast ? 'Sonucu Gör ✨' : 'İleri →';
+  btnNext.className = 'btn ' + (isLast ? 'btn-result' : 'btn-next');
+  btnNext.disabled = saved === null;
+}
+
+function select(idx) {
+  answers[current] = idx;
+  document.querySelectorAll('.option-btn').forEach((b, i) => {
+    b.classList.toggle('selected', i === idx);
+  });
+  document.getElementById('btnNext').disabled = false;
+}
+
+function navigate(dir) {
+  if (dir === 1 && current === questions.length - 1) {
+    showResult();
+    return;
+  }
+  current = Math.max(0, Math.min(questions.length - 1, current + dir));
+  renderQuestion();
+}
+
+// ── RESULT ──
+function showResult() {
+  const counts = { A: 0, B: 0, C: 0, D: 0 };
+  answers.forEach(a => { if (a !== null) counts[letters[a]]++; });
+
+  const dominant = Object.entries(counts).sort((x, y) => y[1] - x[1])[0][0];
+
+  const profiles = {
+    A: {
+      emoji: '🌸',
+      badge: 'badge-green',
+      badgeText: '💚 İdeal Liman',
+      title: 'Sen Eşin İçin Huzurlu Bir Liman Sunuyorsun',
+      msg: 'Paylaştığın metinlerdeki "ideal liman" görevini büyük ölçüde yerine getiriyorsun. Nezaket, güven ve çaban gerçek ve tutarlı. Bu kaliteyi korumak, bazen sıfırdan inşa etmekten daha zor olduğunu unutma. Kendine de nazik ol.'
+    },
+    B: {
+      emoji: '🌿',
+      badge: 'badge-gold',
+      badgeText: '💛 İyi Niyetli & Yorgun',
+      title: 'İyi Niyetlisin ama Biraz Daha Farkındalık Bağı Güçlendirir',
+      msg: 'Temel niyetin sağlam; ama yorgunluk, rutin ve hayatın koşturmacası zaman zaman eşine verdiğin enerjiyi düşürüyor. Küçük ama bilinçli jest ve dokunuşlar bu dengeyi ciddi ölçüde iyileştirebilir.'
+    },
+    C: {
+      emoji: '⚠️',
+      badge: 'badge-orange',
+      badgeText: '🟠 Dikkat: Sessiz Alarm',
+      title: 'İlişkinde "Sessizce Ölen" Bir Bağ Alarmı Çalıyor',
+      msg: 'Cevapların, eşinin senden uzaklaşma riskini işaret ediyor. Ona haklı çıkmak için söylenenlerin onu içine kapattığını görmek, en önemli adımdır. Kavga etmeden sormayı dene: "Seni bu noktaya getiren bende ne gördün?"'
+    },
+    D: {
+      emoji: '🆘',
+      badge: 'badge-red',
+      badgeText: '🔴 Kritik: Acil Farkındalık',
+      title: 'İlişkin Gerçek Bir Kırılma Noktasında',
+      msg: 'Bu cevaplar ciddi. Eşin muhtemelen sessizce çok şey taşıyor. Buradaki dürüstlüğün zaten büyük bir cesaret. Sonraki adım: Bu anketi eşinle paylaşmak değil, önce kendinle oturup "Ben nasıl bir eş olmak istiyorum?" sorusunu sormak.'
+    }
+  };
+
+  const p = profiles[dominant];
+  const total = answers.filter(a => a !== null).length;
+
+  document.getElementById('surveyScreen').classList.add('hidden');
+  const rs = document.getElementById('resultScreen');
+  rs.classList.remove('hidden');
+
+  rs.innerHTML = `
+    <div class="result-header">
+      <span class="result-emoji">${p.emoji}</span>
+      <h2>Anket Tamamlandı</h2>
+      <div class="divider"></div>
+    </div>
+
+    <div class="score-card">
+      <div class="score-title">Cevap Dağılımın</div>
+      <div class="score-bars">
+        ${['A','B','C','D'].map(l => `
+          <div class="score-row">
+            <span class="score-label">${l}</span>
+            <div class="score-track">
+              <div class="score-fill fill-${l.toLowerCase()}" style="width: ${(counts[l]/total)*100}%"></div>
+            </div>
+            <span class="score-count">${counts[l]} / ${total}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="result-message">
+      <span class="result-badge ${p.badge}">${p.badgeText}</span>
+      <h3>${p.title}</h3>
+      <p>${p.msg}</p>
+    </div>
+
+    <div class="detail-section">
+      <h4>Soru Soru Cevapların</h4>
+      ${questions.map((q, i) => `
+        <div class="detail-row">
+          <span class="detail-q">${i + 1}. ${q.label}</span>
+          <span class="detail-a da-${letters[answers[i]].toLowerCase()}">${letters[answers[i]]}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <button class="btn-restart" onclick="restart()">↺ Tekrar Başla</button>
+  `;
+
+  // animate bars after render
+  setTimeout(() => {
+    const fills = rs.querySelectorAll('.score-fill');
+    fills.forEach(f => { const w = f.style.width; f.style.width = '0'; setTimeout(() => f.style.width = w, 50); });
+  }, 100);
+
+  rs.scrollIntoView({ behavior: 'smooth' });
+}
+
+function restart() {
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  document.getElementById('resultScreen').classList.add('hidden');
+  document.getElementById('surveyScreen').classList.remove('hidden');
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// init
+renderQuestion();
+</script>
+</body>
+</html>
